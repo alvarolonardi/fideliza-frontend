@@ -8,6 +8,7 @@ import ClienteDetalle from './pages/ClienteDetalle';
 import Campanas   from './pages/Campanas';
 import QRGenerator from './pages/QRGenerator';
 import Registro   from './pages/Registro';
+import Privacidad from './pages/Privacidad';
 import './styles/global.css';
 
 function PrivateRoute({ children }) {
@@ -21,9 +22,10 @@ export default function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          {/* Ruta pública: landing de registro desde QR */}
-          <Route path="/registro" element={<Registro />} />
-          <Route path="/login"    element={<Login />} />
+          {/* Rutas públicas */}
+          <Route path="/registro"  element={<Registro />} />
+          <Route path="/login"     element={<Login />} />
+          <Route path="/privacidad" element={<Privacidad />} />
 
           {/* Rutas privadas: panel admin */}
           <Route path="/" element={
