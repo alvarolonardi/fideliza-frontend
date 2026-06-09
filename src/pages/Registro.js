@@ -8,11 +8,9 @@ const VINO   = '#8B1A1A';
 const VINO_H = '#6e1414';
 
 const REDES = [
-  { id: 'ig_mujer',  label: 'Mujer',  icon: 'ig', url: 'https://www.instagram.com/casasierra.woman', color: '#E1306C' },
-  { id: 'fb_mujer',  label: 'Mujer',  icon: 'fb', url: 'https://www.facebook.com/casasierrawoman',  color: '#1877F2' },
-  { id: 'ig_hombre', label: 'Hombre', icon: 'ig', url: 'https://www.instagram.com/casa_sierra',     color: '#E1306C' },
-  { id: 'fb_hombre', label: 'Hombre', icon: 'fb', url: 'https://www.facebook.com/casasierra',       color: '#1877F2' },
-  { id: 'tienda',    label: 'Tienda', icon: 'shop',url: 'https://www.casasierrashop.com',            color: VINO     },
+  { id: 'ig_mujer',  label: 'Mujer',  icon: 'ig',   url: 'https://www.instagram.com/casasierra.woman', color: '#E1306C' },
+  { id: 'ig_hombre', label: 'Hombre', icon: 'ig',   url: 'https://www.instagram.com/casa_sierra',      color: '#E1306C' },
+  { id: 'tienda',    label: 'Tienda', icon: 'shop',  url: 'https://www.casasierrashop.com.ar/',         color: VINO     },
 ];
 
 function IgIcon({ size = 14 }) {
