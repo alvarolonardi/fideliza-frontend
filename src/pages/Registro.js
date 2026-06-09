@@ -205,7 +205,7 @@ export default function Registro() {
           </div>
           <div style={{ marginBottom: 14 }}>
             <label style={styles.label}>WHATSAPP (CON CÓDIGO DE ÁREA)</label>
-            <input style={styles.input} required placeholder="+54 9 3446 377495" type="tel"
+            <input style={styles.input} required placeholder="3446 000000" type="tel"
               value={form.telefono} onChange={e => setForm({ ...form, telefono: e.target.value })} />
           </div>
           <div style={{ marginBottom: 20 }}>
