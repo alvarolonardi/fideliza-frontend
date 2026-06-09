@@ -9,6 +9,7 @@ export default function QRGenerator() {
   const [qrData, setQrData]   = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState('');
+  const [copiado, setCopiado] = useState(false);
 
   const generar = async () => {
     setLoading(true);
@@ -23,23 +24,24 @@ export default function QRGenerator() {
     }
   };
 
+  const copiarLink = () => {
+    navigator.clipboard.writeText(qrData.url);
+    setCopiado(true);
+    setTimeout(() => setCopiado(false), 2000);
+  };
+
   const descargar = () => {
     const svg = document.getElementById('qr-svg');
     if (!svg) return;
-
-    // Crear SVG con logo/texto incluido para imprimir
     const wrapper = `
       <svg xmlns="http://www.w3.org/2000/svg" width="320" height="380" viewBox="0 0 320 380">
         <rect width="320" height="380" fill="#ffffff" rx="16"/>
-        <!-- QR -->
         ${svg.innerHTML}
-        <!-- Texto inferior -->
         <text x="160" y="350" font-family="Georgia,serif" font-size="18" font-weight="bold"
               fill="${VINO}" text-anchor="middle">Casa Sierra</text>
         <text x="160" y="370" font-family="Arial,sans-serif" font-size="11"
               fill="#888" text-anchor="middle">Escaneá y sumá puntos</text>
       </svg>`;
-
     const blob = new Blob([wrapper], { type: 'image/svg+xml' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
@@ -125,19 +127,36 @@ export default function QRGenerator() {
               </div>
             )}
 
-            {/* Instrucciones de Twilio */}
-            <div style={{ marginTop: 20, padding: 14, background: '#fff8f0',
-                          border: '1px solid #f5c87a', borderRadius: 8 }}>
-              <p style={{ fontSize: 12, fontWeight: 700, color: '#8a6000', marginBottom: 8 }}>
-                ⚠️ Para que el WhatsApp funcione al escanear:
-              </p>
-              <ol style={{ fontSize: 12, color: '#7a5800', paddingLeft: 16, margin: 0, lineHeight: 1.7 }}>
-                <li>Completá <code>TWILIO_ACCOUNT_SID</code> y <code>TWILIO_AUTH_TOKEN</code> en el <code>.env</code></li>
-                <li>Cambiá <code>WHATSAPP_MOCK=false</code> en el <code>.env</code></li>
-                <li>El cliente que escanee <strong>debe haber unido el sandbox</strong> primero enviando el mensaje de activación a Twilio</li>
-                <li>Cuando tengas un número aprobado de Twilio, cambiá <code>TWILIO_WHATSAPP_FROM</code></li>
-              </ol>
-            </div>
+            {/* Compartir link por WhatsApp */}
+            {qrData && (
+              <div style={{ marginTop: 16, padding: 14, background: '#f0fdf4',
+                            border: '1px solid #86efac', borderRadius: 8 }}>
+                <p style={{ fontSize: 12, fontWeight: 700, color: '#166534', marginBottom: 6 }}>
+                  📲 Compartir link de registro
+                </p>
+                <p style={{ fontSize: 11, color: '#166534', marginBottom: 12, lineHeight: 1.5 }}>
+                  Mandá este link por WhatsApp desde tu teléfono. El cliente lo toca y se registra igual que escaneando el QR.
+                </p>
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                  <button
+                    className="btn btn-ghost"
+                    style={{ fontSize: 12 }}
+                    onClick={copiarLink}
+                  >
+                    {copiado ? '✅ ¡Copiado!' : '📋 Copiar link'}
+                  </button>
+                  <a
+                    href={`https://wa.me/?text=${encodeURIComponent('¡Hola! Registrate en el programa de puntos de Casa Sierra y empezá a ganar beneficios 🎁\n\n' + qrData.url)}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="btn btn-primary"
+                    style={{ background: '#25D366', fontSize: 12, textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}
+                  >
+                    💬 Compartir por WhatsApp
+                  </a>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* ── Panel derecho: vista previa ── */}
@@ -145,7 +164,6 @@ export default function QRGenerator() {
             <div className="card-title">Vista previa</div>
             {qrData ? (
               <>
-                {/* QR con marco Casa Sierra */}
                 <div style={{
                   display: 'inline-block',
                   padding: 20,
@@ -201,8 +219,8 @@ export default function QRGenerator() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: 16, fontSize: 13 }}>
             {[
               ['1. Imprimí el QR', 'Tamaño A5 o mayor con el botón "Imprimir QR". Colocalo en el mostrador, espejo del probador o bolsa.'],
-              ['2. Capacitá a las vendedoras', 'Guión: "Escaneá esto y sumá puntos en tu próxima compra 🎁"'],
-              ['3. Cliente escanea', 'Va a la landing de Casa Sierra, completa nombre y WhatsApp en 30 segundos.'],
+              ['2. Compartí el link', 'Usá el botón "Compartir por WhatsApp" para mandar el link desde tu teléfono personal o el del local.'],
+              ['3. Cliente se registra', 'Va a la landing de Casa Sierra, completa nombre y WhatsApp en 30 segundos.'],
               ['4. Sistema hace el resto', 'Bienvenida automática por WhatsApp, puntos acumulados, seguimiento.'],
             ].map(([t, d]) => (
               <div key={t} style={{ padding: 14, background: '#fdf5f5', borderRadius: 8 }}>
