@@ -18,6 +18,9 @@ export default function ClienteDetalle() {
   const [compraForm, setCompraForm] = useState({ monto:'', desc:'' });
   const [msgEnviado, setMsgEnviado] = useState('');
   const [loading, setLoading]       = useState(true);
+  const [canjeForm, setCanjeForm]   = useState('');
+  const [canjeMsg, setCanjeMsg]     = useState('');
+  const [canjeError, setCanjeError] = useState('');
 
   const cargar = async () => {
     setLoading(true);
@@ -39,6 +42,33 @@ export default function ClienteDetalle() {
     setMsgEnviado(`Mensaje "${tipo}" enviado ✓ — Estado: ${data.estado}`);
     setTimeout(() => setMsgEnviado(''), 3000);
     cargar();
+  };
+
+  const canjearPuntos = async () => {
+    const puntos = parseInt(canjeForm);
+    if (!puntos || puntos < 500) {
+      setCanjeError('El mínimo para canjear es 500 puntos.');
+      return;
+    }
+    if (puntos % 500 !== 0) {
+      setCanjeError('Solo podés canjear múltiplos de 500 puntos (500, 1000, 1500...).');
+      return;
+    }
+    if (puntos > cliente.puntos) {
+      setCanjeError(`El cliente solo tiene ${cliente.puntos} puntos disponibles.`);
+      return;
+    }
+    try {
+      const credito = puntos * 100;
+      await api.post(`/clientes/${id}/canje-puntos`, { puntos });
+      setCanjeMsg(`✓ Canje realizado: ${puntos} puntos → $${credito.toLocaleString('es-AR')} en crédito`);
+      setCanjeForm('');
+      setCanjeError('');
+      setTimeout(() => setCanjeMsg(''), 4000);
+      cargar();
+    } catch (err) {
+      setCanjeError(err.response?.data?.error || 'Error al procesar el canje.');
+    }
   };
 
   const toggleVip = async () => {
@@ -113,6 +143,48 @@ export default function ClienteDetalle() {
               </button>
             </form>
           </div>
+        </div>
+
+        {/* Canje de puntos */}
+        <div className="card mb24">
+          <div className="card-title">Canjear puntos</div>
+          <div style={{display:'flex',alignItems:'center',gap:12,flexWrap:'wrap',marginBottom:10}}>
+            <div style={{fontSize:13,color:'#5a5856'}}>
+              Puntos disponibles: <strong style={{color:'#c9a84c',fontSize:16}}>{Number(cliente.puntos).toLocaleString('es-AR')}</strong>
+              <span style={{color:'#9e9c97',marginLeft:8}}>(= ${Number(cliente.puntos * 100).toLocaleString('es-AR')} en crédito)</span>
+            </div>
+          </div>
+          {canjeMsg && <div className="alert alert-success mb16">{canjeMsg}</div>}
+          {canjeError && <div style={{padding:'10px 14px',background:'#fdecea',color:'#c0392b',borderRadius:8,fontSize:13,marginBottom:12}}>{canjeError}</div>}
+          <div style={{display:'flex',gap:10,alignItems:'flex-end',flexWrap:'wrap'}}>
+            <div className="form-group" style={{marginBottom:0,flex:1,minWidth:180}}>
+              <label>Puntos a canjear (mínimo 500, múltiplos de 500)</label>
+              <input
+                type="number"
+                min="500"
+                step="500"
+                placeholder="500"
+                value={canjeForm}
+                onChange={e => { setCanjeForm(e.target.value); setCanjeError(''); }}
+              />
+            </div>
+            {canjeForm && parseInt(canjeForm) >= 500 && (
+              <div style={{fontSize:13,color:'#1a7a4a',fontWeight:600,paddingBottom:6}}>
+                = ${Number(parseInt(canjeForm) * 100).toLocaleString('es-AR')} en crédito
+              </div>
+            )}
+            <button
+              className="btn btn-primary"
+              style={{background:'#c9a84c',marginBottom:0}}
+              onClick={canjearPuntos}
+              disabled={!canjeForm || parseInt(canjeForm) < 500}
+            >
+              Aplicar canje
+            </button>
+          </div>
+          <p style={{fontSize:11,color:'#9e9c97',marginTop:10}}>
+            1 punto = $100 · Mínimo 500 puntos · El cliente debe mostrar el mensaje de WhatsApp
+          </p>
         </div>
 
         {/* Mensajes rápidos */}
